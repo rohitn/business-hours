@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Scenetap"]
   s.email       = ["shea@scenetap.com"]
   s.homepage    = "https://github.com/scenetap/business-hours"
-  s.summary     = %q{Write a gem summay}
-  s.description = %q{Write a gem description}
+  s.summary     = %q{Defines business hours for bars}
+  s.description = %q{Defines close and open time for business which are open later then 12am}
 
   s.rubyforge_project = "business-hours"
 
