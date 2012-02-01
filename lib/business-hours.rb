@@ -1,3 +1,4 @@
+require 'active_support/core_ext/time/zones'
 require "business-hours/version"
 
 class BusinessHours
