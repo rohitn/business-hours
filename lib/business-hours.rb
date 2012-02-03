@@ -46,12 +46,16 @@ class BusinessHours
     
     open_day = date
     
-    [parse("#{open_day} #{times[0]}"), parse("#{close_day} #{times[1]}")]
+    [parse("#{open_day} #{times[0]}").utc, parse("#{close_day} #{times[1]}").utc]
+  end
+
+  def open_and_close_times(time)
+    for_day((time.in_time_zone(time_zone) - business_day_start * 60 * 60).to_date)
   end
   
   def self.business_date(options = {})
     business_day_start = options[:business_day_start] || 6
-    Time.zone = options[:time_zone] || @time_zone
+    Time.zone = options[:time_zone] || 'Central Time (US & Canada)'
     current_time = options[:current_time] || Time.zone.now
     
     business_date = current_time.hour < business_day_start ? Time.zone.today - 1 : Time.zone.today
