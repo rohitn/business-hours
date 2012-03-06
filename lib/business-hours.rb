@@ -1,9 +1,11 @@
+require 'active_support/core_ext/date/zones'
 require 'active_support/core_ext/time/zones'
+require 'active_support/core_ext/date/calculations'
 require 'active_support/core_ext/time/calculations'
+require 'active_support/time_with_zone'
 require "business-hours/version"
 
 class BusinessHours
-  require 'chronic'
   
   attr_accessor :times, :time_zone, :business_date, :business_day_start
   DAYS = %w(sunday monday tuesday wednesday thursday friday saturday)
@@ -79,7 +81,6 @@ class BusinessHours
     end
     
     def parse(string)
-      Chronic.time_class = Time.zone
-      Chronic.parse(string)
+      Time.zone.parse(string)
     end
 end
