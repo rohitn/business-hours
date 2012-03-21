@@ -47,8 +47,9 @@ class BusinessHours
     end
     
     open_day = date
-    
-    [parse("#{open_day} #{times[0]}").utc, parse("#{close_day} #{times[1]}").utc]
+    open_time = parse("#{open_day} #{times[0]}").utc unless times[0].blank?
+    close_time = parse("#{close_day} #{times[1]}").utc unless times[1].blank?
+    [open_time, close_time]
   end
 
   def open_and_close_times(time)
