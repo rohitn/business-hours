@@ -71,10 +71,10 @@ class BusinessHours
     
     def open_past_midnight(day, times)
       day = get_day(day)
-      open = parse("#{day} #{times[0]}")
-      close = parse("#{day} #{times[1]}")
+      open = parse("#{day} #{times[0]}") unless times[0].blank?
+      close = parse("#{day} #{times[1]}") unless times[1].blank?
       
-      open > close
+      open > close if open && close
     end
     
     def get_day(day_int = 0)
