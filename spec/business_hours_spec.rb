@@ -49,7 +49,7 @@ describe BusinessHours do
   describe 'for_day' do
     it 'should return nil as an element of the return when the provided open_time or close_time was nil or emptystring' do
       business_hours = BusinessHours.new(:times => {:friday => ['',nil], :tuesday => ['9am', '']})
-      business_hours.for_today.should == [nil,nil] #monday march 19th
+      business_hours.for_day(Date.parse('2012-03-19')).should == [nil,nil] #monday march 19th
       business_hours.for_day(Date.parse('2012-03-20')).should == [Time.parse('2012-03-20 9am'),nil] #tuesday march 20th
     end
   end
