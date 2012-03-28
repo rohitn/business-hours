@@ -46,4 +46,18 @@ describe BusinessHours do
       BusinessHours.new({:times => @times, :time_zone => @time_zone, :business_day_start => @business_day_start}).open?.should be_true
     end
   end
+
+  it "returns the correct start and end times for the business day" do
+    @times = {:sunday => ["8:00am","6:00am"]}
+    Time.zone = @time_zone
+    Timecop.freeze(Time.local(2011, 11, 05, 13, 0, 0)) do # Sunday, November 5, 2011 at 1pm
+      @business_time = BusinessHours.new({:times => @times, :time_zone => @time_zone, :business_day_start => @business_day_start}) 
+    end
+    @business_time.business_day.collect{|date| date.to_s}.should == ["2011-11-05 06:00:00 -0500","2011-11-06 06:00:00 -0600"]
+
+    Timecop.freeze(Time.local(2011, 11, 06, 13, 0, 0)) do # Sunday, November 6, 2011 at 1pm
+      @business_time = BusinessHours.new({:times => @times, :time_zone => @time_zone, :business_day_start => @business_day_start}) 
+    end
+    @business_time.business_day.collect{|date| date.to_s}.should == ["2011-11-06 06:00:00 -0600","2011-11-07 06:00:00 -0600"]
+  end
 end
