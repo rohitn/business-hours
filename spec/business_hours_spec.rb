@@ -88,4 +88,16 @@ describe BusinessHours do
       business_hours.send(:open_past_midnight,1,'').should == nil
     end
   end
+  describe 'open?' do
+    it 'should return nil if a day has no open or close time' do
+      Timecop.freeze('2012-03-29 13:43:27 -0500') do #thursday
+        business_hours = BusinessHours.new(:times => {:thursday_open => '9am'})
+        business_hours.open?.should be_nil
+        business_hours = BusinessHours.new(:times => {:thursday_close => '10pm'})
+        business_hours.open?.should be_nil
+        business_hours = BusinessHours.new(:times => {})
+        business_hours.open?.should be_nil
+      end
+    end
+  end
 end
