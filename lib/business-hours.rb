@@ -59,6 +59,13 @@ class BusinessHours
   def open_and_close_times(time)
     for_day((time.in_time_zone(time_zone) - business_day_start * 60 * 60).to_date)
   end
+
+  def business_day
+    Time.zone = time_zone
+    @start_time = Time.zone.parse("#{business_date.to_s} #{business_day_start}:00")
+    @end_time = Time.zone.parse("#{(business_date+1).to_s} #{business_day_start}:00")
+    [@start_time, @end_time]
+  end
   
   def self.business_date(options = {})
     business_day_start = options[:business_day_start] || 6
