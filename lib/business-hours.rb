@@ -47,8 +47,13 @@ class BusinessHours
     end
     
     open_day = date
-    
-    [parse("#{open_day} #{times[0]}").utc, parse("#{close_day} #{times[1]}").utc]
+    open_time = nil
+    close_time = nil
+    if times
+      open_time = parse("#{open_day} #{times[0]}").utc if times[0].present?
+      close_time = parse("#{close_day} #{times[1]}").utc if times[1].present?
+    end
+    [open_time, close_time]
   end
 
   def open_and_close_times(time)
@@ -70,10 +75,12 @@ class BusinessHours
     
     def open_past_midnight(day, times)
       day = get_day(day)
-      open = parse("#{day} #{times[0]}")
-      close = parse("#{day} #{times[1]}")
+      if times && times[0].present? && times[1].present?
+        open = parse("#{day} #{times[0]}")
+        close = parse("#{day} #{times[1]}")
       
-      open > close
+        open > close
+      end
     end
     
     def get_day(day_int = 0)

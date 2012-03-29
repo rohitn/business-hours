@@ -46,4 +46,17 @@ describe BusinessHours do
       BusinessHours.new({:times => @times, :time_zone => @time_zone, :business_day_start => @business_day_start}).open?.should be_true
     end
   end
+  describe 'for_day' do
+    it 'should return nil as an element of the return when the provided open_time or close_time was nil or emptystring' do
+      business_hours = BusinessHours.new(:times => {:friday => ['',nil], :tuesday => ['9am', '']})
+      business_hours.for_day(Date.parse('2012-03-19')).should == [nil,nil] #monday march 19th
+      business_hours.for_day(Date.parse('2012-03-20')).should == [Time.parse('2012-03-20 9am'),nil] #tuesday march 20th
+    end
+  end
+  describe 'open_past_midnight' do
+    it 'should return nil when times is blank' do
+      business_hours = BusinessHours.new
+      business_hours.send(:open_past_midnight,1,'').should == nil
+    end
+  end
 end
