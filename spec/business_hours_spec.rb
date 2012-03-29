@@ -68,5 +68,10 @@ describe BusinessHours do
       @business_time = BusinessHours.new({:times => @times, :time_zone => @time_zone, :business_day_start => 2}) 
     end
     @business_time.business_day.collect{|date| date.to_s}.should == ["2012-03-11 03:00:00 -0500","2012-03-12 02:00:00 -0500"]
+
+    Timecop.freeze(Time.local(2012, 03, 11, 13, 0, 0)) do # Sunday, March 11, 2012 at 1pm
+      @business_time = BusinessHours.new({:times => @times, :time_zone => "Hawaii", :business_day_start => 2}) 
+    end
+    @business_time.business_day.collect{|date| date.to_s}.should == ["2012-03-11 03:00:00 -1000","2012-03-12 02:00:00 -1000"]
   end
 end

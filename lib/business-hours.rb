@@ -56,8 +56,9 @@ class BusinessHours
   end
 
   def business_day
-    @start_time = Time.parse("#{business_date.to_s} #{business_day_start}:00").in_time_zone(time_zone)
-    @end_time = Time.parse("#{(business_date+1).to_s} #{business_day_start}:00").in_time_zone(time_zone)
+    Time.zone = time_zone
+    @start_time = Time.zone.parse("#{business_date.to_s} #{business_day_start}:00")
+    @end_time = Time.zone.parse("#{(business_date+1).to_s} #{business_day_start}:00")
     [@start_time, @end_time]
   end
   
