@@ -73,6 +73,13 @@ describe BusinessHours do
       @business_time = BusinessHours.new({:times => @times, :time_zone => "Hawaii", :business_day_start => 2}) 
     end
     @business_time.business_day.collect{|date| date.to_s}.should == ["2012-03-11 03:00:00 -1000","2012-03-12 02:00:00 -1000"]
+
+    business_hours = BusinessHours.new(:times => @times, :business_day_start => 1)
+    business_hours.business_day(Date.parse('2012-04-05')).should == [Time.parse('2012-04-05 1:00:00 -0500'), Time.parse('2012-04-06 1:00:00 -0500')] # thursday 1:30 am
+
+    business_hours = BusinessHours.new(:times => @times, :business_day_start => 2, :time_zone => 'Hawaii')
+    business_hours.business_day(Date.parse('2012-04-07')).should == [Time.parse('2012-04-07 2:00:00 -1000'), Time.parse('2012-04-08 2:00:00 -1000')] # thursday 1:30 am
+
   end
 
   describe 'for_day' do
@@ -143,6 +150,12 @@ describe BusinessHours do
       Timecop.freeze(Time.parse('2012-04-02 06:00:00 -0500')) do #monday
         business_hours = BusinessHours.new
         business_hours.open_today?.should be_false
+      end
+    end
+    it 'should return true even if it is 1am, the next date, but the same business day' do
+      Timecop.freeze(Time.parse('2012-04-03 01:00:00 -0500')) do #tuesday, 1am
+        business_hours = BusinessHours.new(:times => {:monday => ['2pm', '12:30am']})
+        business_hours.open_today?.should be_true
       end
     end
   end

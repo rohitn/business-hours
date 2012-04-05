@@ -33,7 +33,7 @@ class BusinessHours
   end
 
   def open_today?
-    open_on_day?((Time.zone.now - @business_day_start).to_date)
+    open_on_day?((Time.zone.now - @business_day_start * 60 * 60).to_date)
   end
 
   def open_on_day?(day)
