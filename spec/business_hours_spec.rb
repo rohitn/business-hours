@@ -158,5 +158,11 @@ describe BusinessHours do
         business_hours.open_today?.should be_true
       end
     end
+    it 'should return false if given business hours for monday but the current time is 7am the next day' do
+      Timecop.freeze(Time.parse('2012-04-03 07:00:00 -0500')) do #tuesday, 1am
+        business_hours = BusinessHours.new(:times => {:monday => ['2pm', '12:30am']})
+        business_hours.open_today?.should be_false
+      end
+   end
   end
 end
