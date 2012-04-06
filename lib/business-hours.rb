@@ -31,6 +31,15 @@ class BusinessHours
       times[0] <= current_time and current_time <= times[1]
     end
   end
+
+  def open_today?
+    open_on_day?((Time.zone.now - @business_day_start * 60 * 60).to_date)
+  end
+
+  def open_on_day?(day)
+    times = times_for_date(day)
+    !!(times && times[0] && times[1])
+  end
   
   def for_today
     for_day(@business_date)
@@ -61,10 +70,10 @@ class BusinessHours
     for_day((time.in_time_zone(time_zone) - business_day_start * 60 * 60).to_date)
   end
 
-  def business_day
+  def business_day(date = business_date)
     Time.zone = time_zone
-    @start_time = Time.zone.parse("#{business_date.to_s} #{business_day_start}:00")
-    @end_time = Time.zone.parse("#{(business_date+1).to_s} #{business_day_start}:00")
+    @start_time = Time.zone.parse("#{date.to_s} #{business_day_start}:00")
+    @end_time = Time.zone.parse("#{(date+1).to_s} #{business_day_start}:00")
     [@start_time, @end_time]
   end
   
@@ -72,7 +81,6 @@ class BusinessHours
     business_day_start = options[:business_day_start] || 6
     Time.zone = options[:time_zone] || 'Central Time (US & Canada)'
     current_time = options[:current_time] || Time.zone.now
-    
     business_date = current_time.hour < business_day_start ? Time.zone.today - 1 : Time.zone.today
   end
   

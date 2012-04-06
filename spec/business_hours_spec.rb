@@ -73,6 +73,13 @@ describe BusinessHours do
       @business_time = BusinessHours.new({:times => @times, :time_zone => "Hawaii", :business_day_start => 2}) 
     end
     @business_time.business_day.collect{|date| date.to_s}.should == ["2012-03-11 03:00:00 -1000","2012-03-12 02:00:00 -1000"]
+
+    business_hours = BusinessHours.new(:times => @times, :business_day_start => 1)
+    business_hours.business_day(Date.parse('2012-04-05')).should == [Time.parse('2012-04-05 1:00:00 -0500'), Time.parse('2012-04-06 1:00:00 -0500')] # thursday 1:30 am
+
+    business_hours = BusinessHours.new(:times => @times, :business_day_start => 2, :time_zone => 'Hawaii')
+    business_hours.business_day(Date.parse('2012-04-07')).should == [Time.parse('2012-04-07 2:00:00 -1000'), Time.parse('2012-04-08 2:00:00 -1000')] # thursday 1:30 am
+
   end
 
   describe 'for_day' do
@@ -99,5 +106,63 @@ describe BusinessHours do
         business_hours.open?.should be_nil
       end
     end
+  end
+  describe 'business_day' do
+    it 'it should return the business day for today by default' do
+      Timecop.freeze(Time.parse('2012-04-01 10:00:00 -0500')) do # april 1st, 10am
+        business_hours = BusinessHours.new
+        business_hours.business_day.should == [Time.parse('2012-04-01 06:00:00 -0500'), Time.parse('2012-04-02 06:00:00 -0500')]
+      end
+    end
+    it 'should return the business_day of the business_date specified' do
+      business_hours = BusinessHours.new
+      business_hours.business_day(Date.parse('2012-04-10')).should == [Time.parse('2012-04-10 06:00:00 -0500'), Time.parse('2012-04-11 06:00:00 -0500')]
+    end
+  end
+  describe 'open_on_day?' do
+    it 'should return true when there is an open and a close time for today' do
+      business_hours = BusinessHours.new(:times => {:sunday => ['1pm','2pm']})
+      business_hours.open_on_day?(Date.parse('2012-04-01')).should be_true
+    end
+    it "should return false when either the open time or close time for today is missing" do
+      business_hours = BusinessHours.new(:times => {:sunday => ['1pm',nil]})
+      business_hours.open_on_day?(Date.parse('2012-04-01')).should be_false
+    end
+    it 'should return false when there are no times for today' do
+      business_hours = BusinessHours.new
+      business_hours.open_on_day?(Date.parse('2012-04-01')).should be_false
+    end
+  end
+  describe 'open_today?' do
+    it 'should return true when there is an open and a close time for today' do
+      Timecop.freeze(Time.parse('2012-04-02 06:00:00 -0500')) do #monday
+        business_hours = BusinessHours.new(:times => {:monday => ['1pm','2pm']})
+        business_hours.open_today?.should be_true
+      end
+    end
+    it "should return false when either the open time or close time for today is missing" do
+      Timecop.freeze(Time.parse('2012-04-02 06:00:00 -0500')) do #monday
+        business_hours = BusinessHours.new(:times => {:monday => ['1pm',nil]})
+        business_hours.open_today?.should be_false
+      end
+    end
+    it 'should return false when there are no times for today' do
+      Timecop.freeze(Time.parse('2012-04-02 06:00:00 -0500')) do #monday
+        business_hours = BusinessHours.new
+        business_hours.open_today?.should be_false
+      end
+    end
+    it 'should return true even if it is 1am, the next date, but the same business day' do
+      Timecop.freeze(Time.parse('2012-04-03 01:00:00 -0500')) do #tuesday, 1am
+        business_hours = BusinessHours.new(:times => {:monday => ['2pm', '12:30am']})
+        business_hours.open_today?.should be_true
+      end
+    end
+    it 'should return false if given business hours for monday but the current time is 7am the next day' do
+      Timecop.freeze(Time.parse('2012-04-03 07:00:00 -0500')) do #tuesday, 1am
+        business_hours = BusinessHours.new(:times => {:monday => ['2pm', '12:30am']})
+        business_hours.open_today?.should be_false
+      end
+   end
   end
 end
