@@ -27,9 +27,7 @@ class BusinessHours
   def open?(options = {})
     current_time = options[:current_time] || Time.zone.now
     times = for_today
-    if times[0] && times[1]
-      times[0] <= current_time and current_time <= times[1]
-    end
+    !!(times[0] && times[1] && times[0] <= current_time and current_time <= times[1])
   end
   
   def for_today
